@@ -10,6 +10,8 @@
 #include "BlasterBattle/BlasterTypes/CombatState.h"
 #include "BlasterCharacter.generated.h"
 
+class UBoxComponent;
+
 UCLASS()
 class BLASTERBATTLE_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
@@ -44,6 +46,9 @@ public:
 	void UpdateHUDAmmo();
 
 	void SpawnDefaultWeapon();
+
+	UPROPERTY()
+	TMap<FName, UBoxComponent*> HitCollisionBoxes;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -81,7 +86,7 @@ protected:
 	 * Hit Boxes used for server-side Rewind
 	 */
 	UPROPERTY(EditAnywhere, Category = "Hit Boxes")
-	class UBoxComponent* HeadBox;
+	UBoxComponent* HeadBox;
 
 	UPROPERTY(EditAnywhere, Category = "Hit Boxes")
 	UBoxComponent* PelvisBox;
@@ -324,4 +329,5 @@ public:
 	FORCEINLINE UStaticMeshComponent* GetAttachedGrenade() const { return AttachedGrenade; }
 	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
 	bool IsLocallyReloading();
+	FORCEINLINE ULagCompensationComponent* GetLagCompensation() const { return LagCompensation; }
 };
