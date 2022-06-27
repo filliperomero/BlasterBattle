@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BlasterBattle/Character/BlasterCharacter.h"
 #include "Components/ActorComponent.h"
 #include "LagCompensationComponent.generated.h"
 
@@ -144,6 +143,24 @@ protected:
 		const TArray<ABlasterCharacter*>& HitCharacters,
 		const FVector_NetQuantize& TraceStart,
 		const TArray<FVector_NetQuantize>& HitLocations,
+		const float HitTime
+	);
+
+	/**
+	 * Projectile Weapons
+	 */
+
+	FServerSideRewindResult ProjectileConfirmHit(
+		const FFramePackage& Package,
+		ABlasterCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize100& InitialVelocity
+	);
+
+	FServerSideRewindResult ProjectileServerSideRewind(
+		ABlasterCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize100& InitialVelocity,
 		const float HitTime
 	);
 
