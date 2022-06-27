@@ -543,3 +543,20 @@ void ULagCompensationComponent::ShotgunServerScoreRequest_Implementation(
 			UGameplayStatics::ApplyDamage(HitCharacter, Damage, Character->Controller, DamageCauser, UDamageType::StaticClass());
 	}
 }
+
+void ULagCompensationComponent::ProjectileServerScoreRequest_Implementation(ABlasterCharacter* HitCharacter,
+	const FVector_NetQuantize TraceStart, const FVector_NetQuantize100 InitialVelocity, const float HitTime)
+{
+	if (HitCharacter == nullptr || Character == nullptr || Character->GetEquippedWeapon() == nullptr) return;
+
+	const FServerSideRewindResult RewindResult = ProjectileServerSideRewind(HitCharacter, TraceStart, InitialVelocity, HitTime);
+	
+	const float Damage = RewindResult.bIsHeadShot
+		? Character->GetEquippedWeapon()->GetDamage()
+		: Character->GetEquippedWeapon()->GetDamage();
+
+	if (RewindResult.bHitConfirmed)
+	{
+		UGameplayStatics::ApplyDamage(HitCharacter, Damage, Character->Controller, Character->GetEquippedWeapon(), UDamageType::StaticClass());
+	}
+}

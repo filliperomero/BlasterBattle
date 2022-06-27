@@ -97,6 +97,14 @@ public:
 		const float HitTime,
 		AWeapon* DamageCauser
 	);
+
+	UFUNCTION(Server, Reliable)
+	void ProjectileServerScoreRequest(
+		ABlasterCharacter* HitCharacter,
+		const FVector_NetQuantize TraceStart,
+		const FVector_NetQuantize100 InitialVelocity,
+		const float HitTime
+	);
 	
 protected:
 	virtual void BeginPlay() override;
