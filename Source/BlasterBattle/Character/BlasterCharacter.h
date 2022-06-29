@@ -11,6 +11,7 @@
 #include "BlasterCharacter.generated.h"
 
 class UBoxComponent;
+class UAnimMontage;
 
 UCLASS()
 class BLASTERBATTLE_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -23,10 +24,16 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
+
+	/**
+	 * Play Montages
+	 */
 	void PlayFireMontage(bool bAiming);
 	void PlayReloadMontage();
 	void PlayElimMontage();
 	void PlayThrowGrenadeMontage();
+	void PlaySwapMontage();
+	
 	virtual void OnRep_ReplicatedMovement() override;
 
 	void Elim();
@@ -49,6 +56,8 @@ public:
 
 	UPROPERTY()
 	TMap<FName, UBoxComponent*> HitCollisionBoxes;
+	
+	bool bFinishedSwapping = false;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -185,7 +194,7 @@ private:
 	*/
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	class UAnimMontage* FireWeaponMontage;
+	UAnimMontage* FireWeaponMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* ReloadMontage;
@@ -198,6 +207,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* ThrowGrenadeMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* SwapMontage;
 	
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold = 200.f;
