@@ -137,7 +137,7 @@ void UCombatComponent::FireProjectileWeapon()
 		// [Lag Compensation]: We refactor this and call LocalFire so we can have all the animations before we send 
 		// to the server since this will prevent a bad gameplay to the user when he is lagging
 		if (!Character->HasAuthority()) LocalFire(HitTarget);
-		ServerFire(HitTarget);
+		ServerFire(HitTarget, EquippedWeapon->FireDelay);
 	}
 }
 
@@ -152,7 +152,7 @@ void UCombatComponent::FireHitScanWeapon()
 		// [Lag Compensation]: We refactor this and call LocalFire so we can have all the animations before we send 
 		// to the server since this will prevent a bad gameplay to the user when he is lagging
 		if (!Character->HasAuthority()) LocalFire(HitTarget);
-		ServerFire(HitTarget);
+		ServerFire(HitTarget, EquippedWeapon->FireDelay);
 	}
 }
 
@@ -166,7 +166,7 @@ void UCombatComponent::FireShotgun()
 			TArray<FVector_NetQuantize> HitTargets;
 			Shotgun->ShotgunTraceEndWithScatter(HitTarget, HitTargets);
 			if (!Character->HasAuthority()) LocalShotgunFire(HitTargets);
-			ServerShotgunFire(HitTargets);
+			ServerShotgunFire(HitTargets, EquippedWeapon->FireDelay);
 		}
 	}
 }
@@ -184,9 +184,22 @@ bool UCombatComponent::CanFire()
 	return !EquippedWeapon->IsEmpty() && bCanFire && CombatState == ECombatState::ECS_Unoccupied;
 }
 
-void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
+void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget, float FireDelay)
 {
 	MulticastFire(TraceHitTarget);
+}
+
+bool UCombatComponent::ServerFire_Validate(const FVector_NetQuantize& TraceHitTarget, float FireDelay)
+{
+	if (EquippedWeapon)
+	{
+		// Since we are comparing a float, we could have a discrepancy 
+		const bool bNearlyEqual = FMath::IsNearlyEqual(EquippedWeapon->FireDelay, FireDelay, 0.001f);
+
+		return bNearlyEqual;
+	}
+
+	return true;
 }
 
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
@@ -197,9 +210,22 @@ void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& T
 	LocalFire(TraceHitTarget);
 }
 
-void UCombatComponent::ServerShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
+void UCombatComponent::ServerShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets, float FireDelay)
 {
 	MulticastShotgunFire(TraceHitTargets);
+}
+
+bool UCombatComponent::ServerShotgunFire_Validate(const TArray<FVector_NetQuantize>& TraceHitTargets, float FireDelay)
+{
+	if (EquippedWeapon)
+	{
+		// Since we are comparing a float, we could have a discrepancy 
+		const bool bNearlyEqual = FMath::IsNearlyEqual(EquippedWeapon->FireDelay, FireDelay, 0.001f);
+
+		return bNearlyEqual;
+	}
+
+	return true;
 }
 
 void UCombatComponent::MulticastShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
