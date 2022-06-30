@@ -9,6 +9,7 @@
 #include "BlasterBattle/HUD/Announcement.h"
 #include "BlasterBattle/BlasterComponents/CombatComponent.h"
 #include "BlasterBattle/GameState/BlasterBattleGameState.h"
+#include "BlasterBattle/HUD/ReturnToMainMenuWidget.h"
 #include "BlasterBattle/PlayerState/BlasterPlayerState.h"
 #include "BlasterBattle/Weapon/Weapon.h"
 #include "Components/Image.h"
@@ -23,6 +24,33 @@ void ABlasterPlayerController::BeginPlay()
 
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
 	ServerCheckMatchState();
+}
+
+void ABlasterPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	if (InputComponent == nullptr) return;
+
+	InputComponent->BindAction("Quit", IE_Pressed, this, &ThisClass::ShowReturnToMainMenu);
+}
+
+void ABlasterPlayerController::ShowReturnToMainMenu()
+{
+	if (ReturnToMainMenuWidget == nullptr) return;
+
+	ReturnToMainMenu = ReturnToMainMenu == nullptr
+		? CreateWidget<UReturnToMainMenuWidget>(this, ReturnToMainMenuWidget)
+		: ReturnToMainMenu;
+
+	if (ReturnToMainMenu)
+	{
+		bReturnToMainMenuOpen = !bReturnToMainMenuOpen;
+		if (bReturnToMainMenuOpen)
+			ReturnToMainMenu->MenuSetup();
+		else
+			ReturnToMainMenu->MenuTearDown();
+	}
 }
 
 void ABlasterPlayerController::Tick(float DeltaTime)

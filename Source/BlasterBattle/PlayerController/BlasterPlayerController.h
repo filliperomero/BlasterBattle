@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "BlasterPlayerController.generated.h"
 
+class UUserWidget;
+class UReturnToMainMenuWidget;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHighPingDelegate, bool, bPingTooHigh);
 
 /**
@@ -44,6 +47,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 	void SetHUDTime();
 	void PollInit();
 
@@ -77,10 +81,24 @@ protected:
 	void HighPingWarning(int32 PingAmount);
 	void StopHighPingWarning();
 	void CheckPing(float DeltaTime);
+
+	void ShowReturnToMainMenu();
 	
 private:
 	UPROPERTY()
 	class ABlasterHUD* BlasterHUD;
+
+	/**
+	 * ReturnToMain Menu
+	 */
+
+	UPROPERTY(EditAnywhere, Category = HUD)
+	TSubclassOf<UUserWidget> ReturnToMainMenuWidget;
+
+	UPROPERTY()
+	UReturnToMainMenuWidget* ReturnToMainMenu;
+
+	bool bReturnToMainMenuOpen { false };
 
 	UPROPERTY()
 	class ABlasterBattleGameMode* BlasterBattleGameMode;
