@@ -13,6 +13,8 @@
 class UBoxComponent;
 class UAnimMontage;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
+
 UCLASS()
 class BLASTERBATTLE_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
@@ -36,10 +38,10 @@ public:
 	
 	virtual void OnRep_ReplicatedMovement() override;
 
-	void Elim();
+	void Elim(const bool bPlayerLeftGame);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastElim();
+	void MulticastElim(const bool bPlayerLeftGame);
 
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
@@ -58,6 +60,11 @@ public:
 	TMap<FName, UBoxComponent*> HitCollisionBoxes;
 	
 	bool bFinishedSwapping = false;
+
+	FOnLeftGame OnLeftGame;
+
+	UFUNCTION(Server, Reliable)
+	void ServerLeaveGame();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -261,6 +268,8 @@ private:
 	float ElimDelay = 3.f;
 
 	void ElimTimerFinished();
+	
+	bool bLeftGame { false };
 
 	/**
 	* Disolve Effect
