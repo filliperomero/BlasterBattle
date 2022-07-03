@@ -17,11 +17,14 @@
 #include "BlasterBattle/Weapon/WeaponTypes.h"
 #include "BlasterBattle/BlasterComponents/LagCompensationComponent.h"
 #include "BlasterAnimInstance.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "TimerManager.h"
+#include "BlasterBattle/GameState/BlasterBattleGameState.h"
 #include "Sound/SoundCue.h"
 #include "Components/BoxComponent.h"
 
@@ -191,14 +194,11 @@ void ABlasterCharacter::BeginPlay()
 	UpdateHUDHealth();
 	UpdateHUDShield();
 
-	if (HasAuthority()) {
+	if (HasAuthority())
 		OnTakeAnyDamage.AddDynamic(this, &ABlasterCharacter::ReceiveDamage);
-	}
 
 	if (AttachedGrenade)
-	{
 		AttachedGrenade->SetVisibility(false);
-	}
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -284,6 +284,11 @@ void ABlasterCharacter::PollInit()
 		if (BlasterPlayerState) {
 			BlasterPlayerState->AddToScore(0.f);
 			BlasterPlayerState->AddToDefeats(0);
+
+			const ABlasterBattleGameState* BlasterBattleGameState = Cast<ABlasterBattleGameState>(UGameplayStatics::GetGameState(this));
+	
+			if (BlasterBattleGameState && BlasterBattleGameState->TopScoringPlayers.Contains(BlasterPlayerState))
+				MulticastGainedTheLead();
 		}
 	}
 }
@@ -491,9 +496,8 @@ void ABlasterCharacter::MulticastElim_Implementation(const bool bPlayerLeftGame)
 
 	// Disable Character input's
 	bDisableGameplay = true;
-	if (Combat) {
-		Combat->FireButtonPressed(false);
-	}
+	if (Combat) Combat->FireButtonPressed(false);
+	
 	/*if (BlasterPlayerController) {
 		DisableInput(BlasterPlayerController);
 	}*/
@@ -503,23 +507,23 @@ void ABlasterCharacter::MulticastElim_Implementation(const bool bPlayerLeftGame)
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Spawn Elim Bot
-	if (ElimBotEffect) {
+	if (ElimBotEffect)
+	{
 		FVector ElimBotSpawnPoint(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 200.f);
 		ElimBotComponent = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ElimBotEffect, ElimBotSpawnPoint, GetActorRotation());
 	}
 
-	if (ElimBotSound) {
+	if (ElimBotSound)
 		UGameplayStatics::SpawnSoundAtLocation(this, ElimBotSound, GetActorLocation());
-	}
 
 	bool bShouldHideSniperScope = Combat && 
 		Combat->bAiming && 
 		Combat->EquippedWeapon && 
 		Combat->EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle;
 
-	if (IsLocallyControlled() && bShouldHideSniperScope) {
-		ShowSniperScopeWidget(false);
-	}
+	if (IsLocallyControlled() && bShouldHideSniperScope) ShowSniperScopeWidget(false);
+
+	if (CrownComponent) CrownComponent->DestroyComponent();
 
 	GetWorldTimerManager().SetTimer(ElimTimer, this, &ABlasterCharacter::ElimTimerFinished, ElimDelay);
 }
@@ -967,4 +971,32 @@ bool ABlasterCharacter::IsLocallyReloading()
 	if (Combat == nullptr) return false;
 
 	return Combat->bLocallyReloading;
+}
+
+void ABlasterCharacter::MulticastGainedTheLead_Implementation()
+{
+	if (CrownSystem == nullptr) return;
+
+	// Not spawned yet, we should spawn
+	if (CrownComponent == nullptr)
+	{
+		CrownComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			CrownSystem,
+			GetCapsuleComponent(),
+			FName(),
+			GetActorLocation() + FVector(0.f, 0.f, 110.f),
+			GetActorRotation(),
+			EAttachLocation::KeepWorldPosition,
+			false
+		);
+	}
+
+	if (CrownComponent)
+		CrownComponent->Activate();
+}
+
+void ABlasterCharacter::MulticastLostTheLead_Implementation()
+{
+	if (CrownComponent)
+		CrownComponent->DestroyComponent();
 }
