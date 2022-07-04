@@ -127,6 +127,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float Damage = 20.f;
 
+	UPROPERTY(EditAnywhere)
+	float HeadShotDamage { 40.f };
+
 	UPROPERTY(Replicated, EditAnywhere, Category = "Lag Compensation")
 	bool bUseServerSideRewind = false;
 
@@ -220,4 +223,5 @@ public:
 	FORCEINLINE int32 GetMagCapacity() const { return MagCapacity; }
 	FORCEINLINE bool GetUseScatter() const { return bUseScatter; }
 	FORCEINLINE float GetDamage() const { return Damage; }
+	FORCEINLINE float GetHeadShotDamage() const { return HeadShotDamage; }
 };

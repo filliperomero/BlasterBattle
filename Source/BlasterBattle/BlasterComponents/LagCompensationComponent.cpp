@@ -509,7 +509,7 @@ void ULagCompensationComponent::ServerScoreRequest_Implementation(ABlasterCharac
 	const FServerSideRewindResult RewindResult = ServerSideRewind(HitCharacter, TraceStart, HitLocation, HitTime);
 
 	const float Damage = RewindResult.bIsHeadShot
-		? DamageCauser->GetDamage()
+		? DamageCauser->GetHeadShotDamage()
 		: DamageCauser->GetDamage();
 
 	if (RewindResult.bHitConfirmed)
@@ -533,7 +533,7 @@ void ULagCompensationComponent::ShotgunServerScoreRequest_Implementation(
 		if (ShotgunRewindResult.HeadShots.Contains(HitCharacter))
 		{
 			// We could get the weapon from HitCharacter->GetEquippedWeapon but this could cause problems
-			Damage += ShotgunRewindResult.HeadShots[HitCharacter] * DamageCauser->GetDamage();
+			Damage += ShotgunRewindResult.HeadShots[HitCharacter] * DamageCauser->GetHeadShotDamage();
 		}
 
 		if (ShotgunRewindResult.BodyShots.Contains(HitCharacter))
@@ -552,7 +552,7 @@ void ULagCompensationComponent::ProjectileServerScoreRequest_Implementation(ABla
 	const FServerSideRewindResult RewindResult = ProjectileServerSideRewind(HitCharacter, TraceStart, InitialVelocity, HitTime);
 	
 	const float Damage = RewindResult.bIsHeadShot
-		? Character->GetEquippedWeapon()->GetDamage()
+		? Character->GetEquippedWeapon()->GetHeadShotDamage()
 		: Character->GetEquippedWeapon()->GetDamage();
 
 	if (RewindResult.bHitConfirmed)
