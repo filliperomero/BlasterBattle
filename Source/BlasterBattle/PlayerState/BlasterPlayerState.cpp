@@ -11,8 +11,8 @@ void ABlasterPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ABlasterPlayerState, Defeats);
+	DOREPLIFETIME(ABlasterPlayerState, Team);
 }
-
 
 // This function will be called only by the Server
 // And we created this one because OnRep_Score will only update the score in the clients
