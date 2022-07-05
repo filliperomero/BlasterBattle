@@ -267,13 +267,10 @@ void ABlasterCharacter::HideWeapons(bool bShouldHide)
 	if (Combat == nullptr) return;
 	
 	if (Combat->EquippedWeapon && Combat->EquippedWeapon->GetWeaponMesh())
-	{
 		Combat->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee = bShouldHide;
-	}
+	
 	if (Combat->SecondaryWeapon && Combat->SecondaryWeapon->GetWeaponMesh())
-	{
 		Combat->SecondaryWeapon->GetWeaponMesh()->bOwnerNoSee = bShouldHide;
-	}
 }
 
 void ABlasterCharacter::PollInit()
