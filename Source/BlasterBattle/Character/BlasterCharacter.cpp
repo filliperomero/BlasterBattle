@@ -502,6 +502,7 @@ void ABlasterCharacter::MulticastElim_Implementation(const bool bPlayerLeftGame)
 	// Disable Collision
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AttachedGrenade->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// Spawn Elim Bot
 	if (ElimBotEffect)
