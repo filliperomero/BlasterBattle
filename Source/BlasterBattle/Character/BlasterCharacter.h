@@ -8,6 +8,7 @@
 #include "BlasterBattle/BlasterTypes/TurningInPlace.h"
 #include "BlasterBattle/Interfaces/InteractWithCrosshairsInterface.h"
 #include "BlasterBattle/BlasterTypes/CombatState.h"
+#include "BlasterBattle/BlasterTypes/Team.h"
 #include "BlasterCharacter.generated.h"
 
 class UBoxComponent;
@@ -74,6 +75,8 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLostTheLead();
+
+	void SetTeamColor(const ETeam Team);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -281,7 +284,7 @@ private:
 	bool bLeftGame { false };
 
 	/**
-	* Disolve Effect
+	* Dissolve Effect
 	*/
 
 	UPROPERTY(VisibleAnywhere)
@@ -296,13 +299,31 @@ private:
 	void UpdateDissolveMaterial(float DissolveValue);
 	void StartDissolve();
 
-	// Dynamic Instance that we can change at runtme
+	// Dynamic Instance that we can change at runtime
 	UPROPERTY(VisibleAnywhere, Category = Elim)
-	UMaterialInstanceDynamic* DynamicDissolevMaterialInstance;
+	UMaterialInstanceDynamic* DynamicDissolveMaterialInstance;
 
-	// Material Instanec set on the blueprint, used with the dynamic material instance
-	UPROPERTY(EditAnywhere, Category = Elim)
+	// Material instance set on the blueprint, used with the dynamic material instance
+	UPROPERTY(VisibleAnywhere, Category = Elim)
 	UMaterialInstance* DissolveMaterialInstance;
+
+	/**
+	 * Team Colors
+	 */
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* RedDissolveMatInst;
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* RedMaterial;
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* BlueDissolveMatInst;
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* BlueMaterial;
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* OriginalMaterial;
 
 	/**
 	* Elim Effects

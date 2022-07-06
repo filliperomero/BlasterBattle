@@ -281,6 +281,7 @@ void ABlasterCharacter::PollInit()
 		if (BlasterPlayerState) {
 			BlasterPlayerState->AddToScore(0.f);
 			BlasterPlayerState->AddToDefeats(0);
+			SetTeamColor(BlasterPlayerState->GetTeam());
 
 			const ABlasterBattleGameState* BlasterBattleGameState = Cast<ABlasterBattleGameState>(UGameplayStatics::GetGameState(this));
 	
@@ -477,11 +478,11 @@ void ABlasterCharacter::MulticastElim_Implementation(const bool bPlayerLeftGame)
 
 	// Start dissolve effect
 	if (DissolveMaterialInstance) {
-		DynamicDissolevMaterialInstance = UMaterialInstanceDynamic::Create(DissolveMaterialInstance, this);
+		DynamicDissolveMaterialInstance = UMaterialInstanceDynamic::Create(DissolveMaterialInstance, this);
 
-		GetMesh()->SetMaterial(0, DynamicDissolevMaterialInstance);
-		DynamicDissolevMaterialInstance->SetScalarParameterValue(TEXT("Dissolve"), 0.55f);
-		DynamicDissolevMaterialInstance->SetScalarParameterValue(TEXT("Glow"), 200.f);
+		GetMesh()->SetMaterial(0, DynamicDissolveMaterialInstance);
+		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Dissolve"), 0.55f);
+		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Glow"), 200.f);
 	}
 
 	StartDissolve();
@@ -889,7 +890,7 @@ void ABlasterCharacter::UpdateHUDAmmo()
 void ABlasterCharacter::UpdateDissolveMaterial(float DissolveValue)
 {
 	if (DissolveMaterialInstance) {
-		DynamicDissolevMaterialInstance->SetScalarParameterValue(TEXT("Dissolve"), DissolveValue);
+		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Dissolve"), DissolveValue);
 	}
 }
 
@@ -997,4 +998,37 @@ void ABlasterCharacter::MulticastLostTheLead_Implementation()
 {
 	if (CrownComponent)
 		CrownComponent->DestroyComponent();
+}
+
+void ABlasterCharacter::SetTeamColor(const ETeam Team)
+{
+	if (GetMesh() == nullptr ||
+		OriginalMaterial == nullptr ||
+		BlueMaterial == nullptr ||
+		RedMaterial == nullptr ||
+		BlueDissolveMatInst == nullptr ||
+		RedDissolveMatInst == nullptr
+	)
+	{
+		return;
+	}
+	
+	switch (Team)
+	{
+	case ETeam::ET_NoTeam:
+		GetMesh()->SetMaterial(0, OriginalMaterial);
+		DissolveMaterialInstance = BlueDissolveMatInst;
+		break;
+	case ETeam::ET_BlueTeam:
+		GetMesh()->SetMaterial(0, BlueMaterial);
+		DissolveMaterialInstance = BlueDissolveMatInst;
+		break;
+	case ETeam::ET_RedTeam:
+		GetMesh()->SetMaterial(0, RedMaterial);
+		DissolveMaterialInstance = RedDissolveMatInst;
+		break;
+	default:
+		GetMesh()->SetMaterial(0, OriginalMaterial);
+		DissolveMaterialInstance = BlueDissolveMatInst;
+	}
 }
