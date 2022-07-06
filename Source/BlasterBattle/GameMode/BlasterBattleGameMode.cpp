@@ -117,7 +117,11 @@ void ABlasterBattleGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacte
 		if (BlasterPlayer && AttackerPlayerState && VictimPlayerState)
 			BlasterPlayer->BroadcastElim(AttackerPlayerState, VictimPlayerState);
 	}
-	
+}
+
+float ABlasterBattleGameMode::CalculateDamage(AController* Attacker, AController* Victim, float BaseDamage)
+{
+	return BaseDamage;
 }
 
 void ABlasterBattleGameMode::RequestRespawn(ACharacter* ElimmedCharacter, AController* ElimmedController)

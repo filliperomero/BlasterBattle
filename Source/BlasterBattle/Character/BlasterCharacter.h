@@ -15,6 +15,7 @@ class UBoxComponent;
 class UAnimMontage;
 class UNiagaraSystem;
 class UNiagaraComponent;
+class ABlasterBattleGameMode;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
 
@@ -359,6 +360,9 @@ private:
 	 */
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWeapon> DefaultWeaponClass;
+
+	UPROPERTY()
+	ABlasterBattleGameMode* BlasterBattleGameMode;
 
 public:	
 	void SetOverlappingWeapon(AWeapon* Weapon);

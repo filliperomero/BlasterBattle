@@ -39,6 +39,8 @@ public:
 
 	float LevelStartingTime = 0.f;
 
+	virtual float CalculateDamage(AController* Attacker, AController* Victim, float BaseDamage);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnMatchStateSet() override;
