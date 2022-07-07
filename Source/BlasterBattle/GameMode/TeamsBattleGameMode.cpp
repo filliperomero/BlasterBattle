@@ -7,6 +7,11 @@
 #include "BlasterBattle/PlayerState/BlasterPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
+ATeamsBattleGameMode::ATeamsBattleGameMode()
+{
+	bTeamsMatch = true;
+}
+
 // Function to add a new player in Mid Game
 void ATeamsBattleGameMode::PostLogin(APlayerController* NewPlayer)
 {

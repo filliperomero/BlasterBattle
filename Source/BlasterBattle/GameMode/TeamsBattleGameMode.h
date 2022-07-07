@@ -15,6 +15,7 @@ class BLASTERBATTLE_API ATeamsBattleGameMode : public ABlasterBattleGameMode
 	GENERATED_BODY()
 
 public:
+	ATeamsBattleGameMode();
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 

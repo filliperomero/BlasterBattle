@@ -44,7 +44,6 @@ void ABlasterBattleGameMode::Tick(float DeltaTime)
 			RestartGame();
 		}
 	}
-
 }
 
 void ABlasterBattleGameMode::BeginPlay()
@@ -63,7 +62,7 @@ void ABlasterBattleGameMode::OnMatchStateSet()
 		ABlasterPlayerController* BlasterPlayer = Cast<ABlasterPlayerController>(*It);
 
 		if (BlasterPlayer) {
-			BlasterPlayer->OnMatchStateSet(MatchState);
+			BlasterPlayer->OnMatchStateSet(MatchState, bTeamsMatch);
 		}
 	}
 }

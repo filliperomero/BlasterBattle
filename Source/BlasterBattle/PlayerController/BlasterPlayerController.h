@@ -33,13 +33,17 @@ public:
 	void SetHUDMatchCountdown(float CountdownTime);
 	void SetHUDAnnouncementCountdown(float CountdownTime);
 	void SetHUDGrenades(int32 Grenades);
+	void HideTeamScores();
+	void InitTeamScores();
+	void SetHUDRedTeamScore(const int32 RedScore);
+	void SetHUDBlueTeamScore(const int32 BlueScore);
 
 	// Synced with server world clock
 	virtual float GetServerTime();
 	// Sync with server clock as soon as possible
 	virtual void ReceivedPlayer() override;
-	void OnMatchStateSet(FName State);
-	void HandleMatchHasStarted();
+	void OnMatchStateSet(FName State, bool bTeamsMatch = false);
+	void HandleMatchHasStarted(bool bTeamsMatch = false);
 	void HandleCooldown();
 
 	float SingleTripTime = 0.f;
@@ -89,6 +93,12 @@ protected:
 
 	UFUNCTION(Client, Reliable)
 	void ClientElimAnnouncement(APlayerState* Attacker, APlayerState* Victim);
+
+	UPROPERTY(ReplicatedUsing = OnRep_ShowTeamScores)
+	bool bShowTeamScore { false };
+
+	UFUNCTION()
+	void OnRep_ShowTeamScores();
 	
 private:
 	UPROPERTY()
