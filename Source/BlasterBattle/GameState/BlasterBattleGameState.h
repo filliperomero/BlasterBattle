@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BlasterBattle/BlasterTypes/Team.h"
 #include "GameFramework/GameState.h"
 #include "BlasterBattleGameState.generated.h"
 
@@ -26,8 +27,7 @@ public:
 	/**
 	 * Team's - Red and Blue
 	 */
-	void RedTeamScores();
-	void BlueTeamScores();
+	void TeamScores(const ETeam Team);
 	
 	TArray<ABlasterPlayerState*> RedTeam;
 	TArray<ABlasterPlayerState*> BlueTeam;
