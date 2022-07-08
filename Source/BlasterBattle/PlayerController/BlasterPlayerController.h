@@ -9,6 +9,8 @@
 class UUserWidget;
 class UReturnToMainMenuWidget;
 class APlayerState;
+class ABlasterPlayerState;
+class ABlasterBattleGameState;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHighPingDelegate, bool, bPingTooHigh);
 
@@ -99,6 +101,9 @@ protected:
 
 	UFUNCTION()
 	void OnRep_ShowTeamScores();
+
+	FString GetInfoText(const TArray<ABlasterPlayerState*>& Players);
+	FString GetTeamsInfoText(const ABlasterBattleGameState* BlasterBattleGameState);
 	
 private:
 	UPROPERTY()
