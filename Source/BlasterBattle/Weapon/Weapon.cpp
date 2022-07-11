@@ -242,7 +242,12 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 {
 	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
 	
-	if (BlasterCharacter) {
+	if (BlasterCharacter)
+	{
+		if (WeaponType == EWeaponType::EWT_Flag && BlasterCharacter->GetTeam() != Team) return;
+
+		if (BlasterCharacter->IsHoldingFlag()) return;
+		
 		BlasterCharacter->SetOverlappingWeapon(this);
 	}
 }
@@ -251,7 +256,12 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 {
 	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
 
-	if (BlasterCharacter) {
+	if (BlasterCharacter)
+	{
+		if (WeaponType == EWeaponType::EWT_Flag && BlasterCharacter->GetTeam() != Team) return;
+		
+		if (BlasterCharacter->IsHoldingFlag()) return;
+		
 		BlasterCharacter->SetOverlappingWeapon(nullptr);
 	}
 }
@@ -358,7 +368,7 @@ void AWeapon::Dropped()
 {
 	SetWeaponState(EWeaponState::EWS_Dropped);
 	FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, true);
-	WeaponMesh->DetachFromComponent(DetachRules);
+	if (WeaponMesh) WeaponMesh->DetachFromComponent(DetachRules);
 	SetOwner(nullptr);
 	// Clean variables on the Server
 	BlasterOwnerCharacter = nullptr;

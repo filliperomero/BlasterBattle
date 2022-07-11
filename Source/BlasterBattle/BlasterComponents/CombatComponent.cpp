@@ -300,9 +300,10 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	{
 		Character->Crouch();
 		bHoldingFlag = true;
-		AttachActorToSocket(WeaponToEquip, FName("FlagSocket"));
 		WeaponToEquip->SetWeaponState(EWeaponState::EWS_Equipped);
+		AttachActorToSocket(WeaponToEquip, FName("FlagSocket"));
 		WeaponToEquip->SetOwner(Character);
+		Flag = WeaponToEquip;
 	}
 	else
 	{

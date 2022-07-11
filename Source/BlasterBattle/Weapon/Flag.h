@@ -16,8 +16,11 @@ class BLASTERBATTLE_API AFlag : public AWeapon
 
 public:
 	AFlag();
+	virtual void Dropped() override;
 
 protected:
+	virtual void OnDropped() override;
+	virtual void OnEquipped() override;
 
 private:
 	UPROPERTY(VisibleAnywhere)

@@ -561,16 +561,23 @@ void ABlasterCharacter::ServerLeaveGame_Implementation()
 
 void ABlasterCharacter::DropOrDestroyWeapons()
 {
-	DropOrDestroyWeapon(Combat->EquippedWeapon);
-	DropOrDestroyWeapon(Combat->SecondaryWeapon);
+	if (Combat == nullptr) return;
+	
+	if (Combat->EquippedWeapon) DropOrDestroyWeapon(Combat->EquippedWeapon);
+
+	if (Combat->SecondaryWeapon) DropOrDestroyWeapon(Combat->SecondaryWeapon);
+
+	if (Combat->Flag) DropOrDestroyWeapon(Combat->Flag);
 }
 
 void ABlasterCharacter::DropOrDestroyWeapon(AWeapon* Weapon)
 {
 	if (Weapon == nullptr) return;
 	
-	if (Weapon->bDestroyWeapon) Weapon->Destroy();
-	else Weapon->Dropped();
+	if (Weapon->bDestroyWeapon)
+		Weapon->Destroy();
+	else
+		Weapon->Dropped();
 }
 
 void ABlasterCharacter::Destroyed()
@@ -1066,4 +1073,13 @@ bool ABlasterCharacter::IsHoldingFlag() const
 	if (Combat == nullptr) return false;
 
 	return Combat->bHoldingFlag;
+}
+
+ETeam ABlasterCharacter::GetTeam()
+{
+	BlasterPlayerState = BlasterPlayerState == nullptr ? GetPlayerState<ABlasterPlayerState>() : BlasterPlayerState;
+	
+	if (BlasterPlayerState == nullptr) return ETeam::ET_NoTeam;
+
+	return BlasterPlayerState->GetTeam();
 }
