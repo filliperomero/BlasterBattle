@@ -36,6 +36,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarriedAmmo, COND_OwnerOnly);
 	DOREPLIFETIME(UCombatComponent, CombatState);
 	DOREPLIFETIME(UCombatComponent, Grenades);
+	DOREPLIFETIME(UCombatComponent, bHoldingFlag);
 }
 
 void UCombatComponent::PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount)
@@ -295,17 +296,29 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 
 	if (CombatState != ECombatState::ECS_Unoccupied) return;
 
-	if (EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
+	if (WeaponToEquip->GetWeaponType() == EWeaponType::EWT_Flag)
 	{
-		EquipSecondaryWeapon(WeaponToEquip);
+		Character->Crouch();
+		bHoldingFlag = true;
+		AttachActorToSocket(WeaponToEquip, FName("FlagSocket"));
+		WeaponToEquip->SetWeaponState(EWeaponState::EWS_Equipped);
+		WeaponToEquip->SetOwner(Character);
 	}
 	else
 	{
-		EquipPrimaryWeapon(WeaponToEquip);
+		if (EquippedWeapon != nullptr && SecondaryWeapon == nullptr)
+		{
+			EquipSecondaryWeapon(WeaponToEquip);
+		}
+		else
+		{
+			EquipPrimaryWeapon(WeaponToEquip);
+		}
+		
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		Character->bUseControllerRotationYaw = true;
 	}
-
-	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-	Character->bUseControllerRotationYaw = true;
+	
 }
 
 void UCombatComponent::SwapWeapons()
@@ -894,4 +907,10 @@ void UCombatComponent::OnRep_Aiming()
 	{
 		bAiming = bAimingButtonPressed;
 	}
+}
+
+void UCombatComponent::OnRep_HoldingFlag()
+{
+	if (bHoldingFlag && Character && Character->IsLocallyControlled())
+		Character->Crouch();
 }

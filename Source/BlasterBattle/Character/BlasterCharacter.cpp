@@ -212,6 +212,14 @@ void ABlasterCharacter::Tick(float DeltaTime)
 
 void ABlasterCharacter::RotateInPlace(float DeltaTime)
 {
+	if (Combat && Combat->bHoldingFlag)
+	{
+		bUseControllerRotationYaw = false;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+		return;
+	}
+	
 	if (bDisableGameplay) {
 		bUseControllerRotationYaw = false;
 		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
@@ -412,7 +420,10 @@ void ABlasterCharacter::PlayHitReactMontage()
 
 void ABlasterCharacter::GrenadeButtonPressed()
 {
-	if (Combat) {
+	if (Combat)
+	{
+		if (Combat->bHoldingFlag) return;
+		
 		Combat->ThrowGrenade();
 	}
 }
@@ -638,6 +649,8 @@ void ABlasterCharacter::EquipButtonPressed()
 	if (bDisableGameplay) return;
 
 	if (Combat) {
+		if (Combat->bHoldingFlag) return;
+		
 		// if (HasAuthority()) {
 		// 	Combat->EquipWeapon(OverlappingWeapon);
 		// }
@@ -675,20 +688,22 @@ void ABlasterCharacter::ServerEquipButtonPressed_Implementation()
 void ABlasterCharacter::CrouchButtonPressed()
 {
 	if (bDisableGameplay) return;
+	if (Combat && Combat->bHoldingFlag) return;
 
-	if (bIsCrouched) {
+	if (bIsCrouched)
 		UnCrouch();
-	}
-	else {
+	else
 		Crouch();
-	}
 }
 
 void ABlasterCharacter::ReloadButtonPressed()
 {
 	if (bDisableGameplay) return;
 
-	if (Combat) {
+	if (Combat)
+	{
+		if (Combat->bHoldingFlag) return;
+		
 		Combat->Reload();
 	}
 }
@@ -697,7 +712,10 @@ void ABlasterCharacter::AimButtonPressed()
 {
 	if (bDisableGameplay) return;
 
-	if (Combat) {
+	if (Combat)
+	{
+		if (Combat->bHoldingFlag) return;
+		
 		Combat->SetAiming(true);
 	}
 }
@@ -706,7 +724,10 @@ void ABlasterCharacter::AimButtonReleased()
 {
 	if (bDisableGameplay) return;
 
-	if (Combat) {
+	if (Combat)
+	{
+		if (Combat->bHoldingFlag) return;
+		
 		Combat->SetAiming(false);
 	}
 }
@@ -800,20 +821,22 @@ void ABlasterCharacter::SimProxiesTurn()
 void ABlasterCharacter::Jump()
 {
 	if (bDisableGameplay) return;
+	if (Combat && Combat->bHoldingFlag) return;
 
-	if (bIsCrouched) {
+	if (bIsCrouched)
 		UnCrouch();
-	}
-	else {
+	else
 		Super::Jump();
-	}
 }
 
 void ABlasterCharacter::FireButtonPressed()
 {
 	if (bDisableGameplay) return;
 
-	if (Combat) {
+	if (Combat)
+	{
+		if (Combat->bHoldingFlag) return;
+		
 		Combat->FireButtonPressed(true);
 	}
 }
@@ -822,7 +845,9 @@ void ABlasterCharacter::FireButtonReleased()
 {
 	if (bDisableGameplay) return;
 
-	if (Combat) {
+	if (Combat)
+	{
+		if (Combat->bHoldingFlag) return;
 		Combat->FireButtonPressed(false);
 	}
 }
@@ -1034,4 +1059,11 @@ void ABlasterCharacter::SetTeamColor(const ETeam Team)
 		GetMesh()->SetMaterial(0, OriginalMaterial);
 		DissolveMaterialInstance = BlueDissolveMatInst;
 	}
+}
+
+bool ABlasterCharacter::IsHoldingFlag() const
+{
+	if (Combat == nullptr) return false;
+
+	return Combat->bHoldingFlag;
 }

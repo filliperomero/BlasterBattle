@@ -242,6 +242,12 @@ private:
 	int32 MaxGrenades = 4;
 
 	void UpdateHUDGrenades();
+
+	UPROPERTY(ReplicatedUsing = OnRep_HoldingFlag)
+	bool bHoldingFlag { false };
+
+	UFUNCTION()
+	void OnRep_HoldingFlag();
 public:
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 	FORCEINLINE int32 GetCarriedAmmo() const { return CarriedAmmo; }
