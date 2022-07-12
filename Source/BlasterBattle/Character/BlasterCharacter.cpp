@@ -25,6 +25,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "TimerManager.h"
 #include "BlasterBattle/GameState/BlasterBattleGameState.h"
+#include "BlasterBattle/PlayerStart/TeamPlayerStart.h"
 #include "Sound/SoundCue.h"
 #include "Components/BoxComponent.h"
 
@@ -287,10 +288,9 @@ void ABlasterCharacter::PollInit()
 	if (BlasterPlayerState == nullptr) {
 		// This cannot be placed in BeginPlay because in the first frame, GetPlayerState will return nullptr
 		BlasterPlayerState = GetPlayerState<ABlasterPlayerState>();
-		if (BlasterPlayerState) {
-			BlasterPlayerState->AddToScore(0.f);
-			BlasterPlayerState->AddToDefeats(0);
-			SetTeamColor(BlasterPlayerState->GetTeam());
+		if (BlasterPlayerState)
+		{
+			OnPlayerStateInitialized();
 
 			const ABlasterBattleGameState* BlasterBattleGameState = Cast<ABlasterBattleGameState>(UGameplayStatics::GetGameState(this));
 	
@@ -1082,4 +1082,39 @@ ETeam ABlasterCharacter::GetTeam()
 	if (BlasterPlayerState == nullptr) return ETeam::ET_NoTeam;
 
 	return BlasterPlayerState->GetTeam();
+}
+
+void ABlasterCharacter::OnPlayerStateInitialized()
+{
+	if (BlasterPlayerState == nullptr) return;
+	
+	BlasterPlayerState->AddToScore(0.f);
+	BlasterPlayerState->AddToDefeats(0);
+	SetTeamColor(BlasterPlayerState->GetTeam());
+	SetSpawnPoint();
+}
+
+void ABlasterCharacter::SetSpawnPoint()
+{
+	if (!HasAuthority() && BlasterPlayerState->GetTeam() == ETeam::ET_NoTeam) return;
+
+	TArray<AActor*> PlayerStarts;
+	UGameplayStatics::GetAllActorsOfClass(this, ATeamPlayerStart::StaticClass(), PlayerStarts);
+
+	TArray<ATeamPlayerStart*> TeamPlayerStarts;
+	for (auto Start : PlayerStarts)
+	{
+		ATeamPlayerStart* TeamStart = Cast<ATeamPlayerStart>(Start);
+		if (TeamStart && TeamStart->Team == BlasterPlayerState->GetTeam())
+			TeamPlayerStarts.Add(TeamStart);
+	}
+
+	if (TeamPlayerStarts.Num() > 0)
+	{
+		const ATeamPlayerStart* ChosenPlayerStart = TeamPlayerStarts[FMath::RandRange(0, TeamPlayerStarts.Num() - 1)];
+		SetActorLocationAndRotation(
+			ChosenPlayerStart->GetActorLocation(),
+			ChosenPlayerStart->GetActorRotation()
+		);
+	}
 }
