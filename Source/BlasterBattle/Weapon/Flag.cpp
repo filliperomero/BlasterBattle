@@ -3,6 +3,7 @@
 
 #include "Flag.h"
 
+#include "BlasterBattle/Character/BlasterCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 
@@ -18,6 +19,13 @@ AFlag::AFlag()
 	GetPickupWidget()->SetupAttachment(FlagMesh);
 }
 
+void AFlag::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InitialTransform = GetActorTransform();
+}
+
 void AFlag::Dropped()
 {
 	SetWeaponState(EWeaponState::EWS_Dropped);
@@ -27,7 +35,33 @@ void AFlag::Dropped()
 	// Clean variables on the Server
 	BlasterOwnerCharacter = nullptr;
 	BlasterOwnerController = nullptr;
-	UE_LOG(LogTemp, Warning, TEXT("DROPPED FUNCTION"));
+}
+
+void AFlag::ResetFlag()
+{
+	ABlasterCharacter* FlagBearer = Cast<ABlasterCharacter>(GetOwner());
+	if (FlagBearer)
+	{
+		FlagBearer->SetHoldingFlag(false);
+		FlagBearer->SetOverlappingWeapon(nullptr);
+		FlagBearer->UnCrouch();
+	}
+
+	if (HasAuthority())
+	{
+		SetWeaponState(EWeaponState::EWS_Initial);
+		GetAreaSphere()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		GetAreaSphere()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+	
+		FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, true);
+		if (FlagMesh) FlagMesh->DetachFromComponent(DetachRules);
+		SetOwner(nullptr);
+		// Clean variables on the Server
+		BlasterOwnerCharacter = nullptr;
+		BlasterOwnerController = nullptr;
+
+		SetActorTransform(InitialTransform);
+	}
 }
 
 void AFlag::OnDropped()
@@ -49,8 +83,6 @@ void AFlag::OnDropped()
 	}
 	
 	EnableCustomDepth(true);
-
-	UE_LOG(LogTemp, Warning, TEXT("OnDropped FUNCTION"));
 }
 
 void AFlag::OnEquipped()
@@ -62,10 +94,9 @@ void AFlag::OnEquipped()
 	{
 	    FlagMesh->SetSimulatePhysics(false);
 	    FlagMesh->SetEnableGravity(false);
-	    FlagMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	    FlagMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		FlagMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
 	}
 	
     EnableCustomDepth(false);
-
-	UE_LOG(LogTemp, Warning, TEXT("OnEquipped FUNCTION"));
 }

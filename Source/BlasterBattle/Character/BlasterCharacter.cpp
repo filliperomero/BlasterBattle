@@ -220,6 +220,12 @@ void ABlasterCharacter::RotateInPlace(float DeltaTime)
 		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 		return;
 	}
+
+	if (Combat && Combat->EquippedWeapon)
+	{
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+		bUseControllerRotationYaw = true;
+	}
 	
 	if (bDisableGameplay) {
 		bUseControllerRotationYaw = false;
@@ -1117,4 +1123,11 @@ void ABlasterCharacter::SetSpawnPoint()
 			ChosenPlayerStart->GetActorRotation()
 		);
 	}
+}
+
+void ABlasterCharacter::SetHoldingFlag(const bool bHolding)
+{
+	if (Combat == nullptr) return;
+
+	Combat->bHoldingFlag = bHolding;
 }
