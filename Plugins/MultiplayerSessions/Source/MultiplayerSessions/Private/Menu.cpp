@@ -7,10 +7,10 @@
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
 
-void UMenu::MenuSetup(int32 NumberOfPublicConections, FString TypeOfMatch, FString LobbyPath)
+void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch, FString LobbyPath)
 {
 	PathToLobby = FString::Printf(TEXT("%s?listen"), *LobbyPath);
-	NumPublicConections = NumberOfPublicConections;
+	NumPublicConnections = NumberOfPublicConnections;
 	MatchType = TypeOfMatch;
 
 	AddToViewport();
