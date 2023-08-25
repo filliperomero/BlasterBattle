@@ -488,6 +488,12 @@ void ABlasterPlayerController::SetHUDTime()
 	uint32 SecondsLeft = FMath::CeilToInt(TimeLeft);
 
 	if (HasAuthority()) {
+		// Fix: Fix to sync HUD timer between client and server
+		if (BlasterBattleGameMode == nullptr)
+		{
+			BlasterBattleGameMode = Cast<ABlasterBattleGameMode>(UGameplayStatics::GetGameMode(this));
+			LevelStartingTime = BlasterBattleGameMode->LevelStartingTime;
+		}
 		BlasterBattleGameMode = BlasterBattleGameMode == nullptr ? Cast<ABlasterBattleGameMode>(UGameplayStatics::GetGameMode(this)) : BlasterBattleGameMode;
 
 		if (BlasterBattleGameMode) {
